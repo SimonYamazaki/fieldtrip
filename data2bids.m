@@ -1892,7 +1892,6 @@ for i=1:numel(modality)
           
           if strcmp(modality{i}, 'events')
             % merge complete rows
-            %modality_tsv.response_time
             modality_tsv = merge_table(modality_tsv, existing);
           else
             % use the channel name as the unique key
@@ -2206,7 +2205,7 @@ else
     sample       = ([event.sample])';              % in samples, the first sample of the file is 1
     type         = {event.type}';
     value        = {event.value}';
-    response_time= {event.response_time}';
+    
   end
   if all(cellfun(@isnumeric, type))
     % this can be an array of strings or values
@@ -2216,14 +2215,27 @@ else
     % this can be an array of strings or values
     value = cell2mat(value);
   end
-  if all(cellfun(@isnumeric, response_time))
-    % this can be an array of strings or values
-    value = cell2mat(response_time);
+  
+  fn = fieldnames(event);
+  additional_measures = {};
+  for ii = 1:length(fn)-5
+    col = {event.(fn{ii+5})};
+    if all(cellfun(@isnumeric, col))
+    %    this can be an array of strings or values
+        additional_measures{end+1} = cell2mat(col);
+    else
+        additional_measures{end+1} = col;
+    end
   end
+
   if exist('sample', 'var')
-    tab = table(onset, duration, sample, type, value, response_time);
+    tab = table(onset, duration, sample, type, value);
+    for ii = 1:length(fn)-5
+        tab = [tab, table(additional_measures{ii}', 'VariableNames', {fn{ii+5}})];
+    end
+    
   else
-    tab = table(onset, duration, type, value, response_time);
+    tab = table(onset, duration, type, value);
   end
 end
 

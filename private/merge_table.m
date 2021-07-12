@@ -47,7 +47,7 @@ if nargin==2
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % merge by comparing the complete rows
   
-  assert(isequal(t1.Properties.VariableNames, t2.Properties.VariableNames));
+  assert(isequal(t1.Properties.VariableNames, t2.Properties.VariableNames),'One of the tables being merged contains less columns');
   
   [m1, n1] = size(t1);
   [m2, n2] = size(t2);
