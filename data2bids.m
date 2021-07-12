@@ -777,7 +777,7 @@ need_electrodes_tsv     = false; % only needed when actually present as cfg.elec
 need_optodes_tsv        = false; % only needed when actually present as cfg.optodes, data.opto or as cfg.opto
 
 switch typ
-  case {'nifti', 'nifti2', 'nifti_gz'}
+  case {'nifti', 'nifti2', 'nifti_fsl'}
     mri = ft_read_mri(cfg.dataset);
     if ~isempty(cfg.dicomfile)
       % read the header details from the matching DICOM file specified by the user
@@ -963,12 +963,17 @@ switch typ
     eventopt  = ft_setopt(eventopt, 'eventformat',     ft_getopt(cfg, 'eventformat'));         % is passed to low-level function, empty implies autodetection
     
     if ~isempty(cfg.dataset)
-      hdr = ft_read_header(cfg.headerfile, headeropt{:});
-      if strcmp(cfg.method, 'convert')
-        % the data should be converted and written to disk
-        dat = ft_read_data(cfg.datafile, 'header', hdr, 'begsample', 1, 'endsample', hdr.nSamples*hdr.nTrials, dataopt{:});
-        trigger = ft_read_event(cfg.datafile, 'header', hdr, eventopt{:});
+      if cfg.sourcedata
+          fprintf('Working with sourcedata')
+      else
+          hdr = ft_read_header(cfg.headerfile, headeropt{:});
+          if strcmp(cfg.method, 'convert')
+            % the data should be converted and written to disk
+            dat = ft_read_data(cfg.datafile, 'header', hdr, 'begsample', 1, 'endsample', hdr.nSamples*hdr.nTrials, dataopt{:});
+            trigger = ft_read_event(cfg.datafile, 'header', hdr, eventopt{:});
+          end
       end
+      
       % FIXME try to get the electrode definition, either from the data or from the configuration
     end
     
@@ -1578,8 +1583,10 @@ if need_events_tsv
   elseif isstruct(cfg.events) && ~isempty(cfg.events) && numel(fieldnames(cfg.events))>0
     % it is the output from FT_READ_EVENT
     if exist('hdr', 'var')
+      disp('WAS HERE 1')
       events_tsv = event2table(hdr, cfg.events);
     else
+      disp('WAS HERE 2')
       events_tsv = event2table([], cfg.events);
     end
   elseif isnumeric(cfg.events) && ~isempty(cfg.events)
@@ -1597,12 +1604,15 @@ if need_events_tsv
   elseif exist('trigger', 'var')
     % convert the triggers from FT_READ_EVENT into a table
     if exist('hdr', 'var')
+      disp('WAS HERE 3')
       events_tsv = event2table(hdr, trigger);
     else
+      disp('WAS HERE 4')
       events_tsv = event2table([], trigger);
     end
   elseif ~isempty(cfg.presentationfile)
     % read the presentation file and convert into a table
+    disp('WAS HERE 5')
     events_tsv = event2table([], ft_read_event(cfg.presentationfile));
   else
     ft_warning('no events were specified');
@@ -1879,8 +1889,10 @@ for i=1:numel(modality)
         if ~isempty(existing)
           modality_tsv  = output_compatible(modality_tsv);
           existing      = output_compatible(existing);
+          
           if strcmp(modality{i}, 'events')
             % merge complete rows
+            %modality_tsv.response_time
             modality_tsv = merge_table(modality_tsv, existing);
           else
             % use the channel name as the unique key
@@ -2194,6 +2206,7 @@ else
     sample       = ([event.sample])';              % in samples, the first sample of the file is 1
     type         = {event.type}';
     value        = {event.value}';
+    response_time= {event.response_time}';
   end
   if all(cellfun(@isnumeric, type))
     % this can be an array of strings or values
@@ -2203,10 +2216,14 @@ else
     % this can be an array of strings or values
     value = cell2mat(value);
   end
+  if all(cellfun(@isnumeric, response_time))
+    % this can be an array of strings or values
+    value = cell2mat(response_time);
+  end
   if exist('sample', 'var')
-    tab = table(onset, duration, sample, type, value);
+    tab = table(onset, duration, sample, type, value, response_time);
   else
-    tab = table(onset, duration, type, value);
+    tab = table(onset, duration, type, value, response_time);
   end
 end
 
