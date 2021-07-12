@@ -963,7 +963,7 @@ switch typ
     eventopt  = ft_setopt(eventopt, 'eventformat',     ft_getopt(cfg, 'eventformat'));         % is passed to low-level function, empty implies autodetection
     
     if ~isempty(cfg.dataset)
-      if cfg.sourcedata
+      if cfg.non_raw_data
           fprintf('Working with sourcedata')
       else
           hdr = ft_read_header(cfg.headerfile, headeropt{:});
