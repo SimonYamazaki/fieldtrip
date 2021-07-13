@@ -943,6 +943,10 @@ switch typ
       need_motion_json = true;
     elseif isequal(cfg.datatype, 'events')
       need_events_tsv = true;
+    elseif isequal(cfg.datatype, 'eeg_deriv') 
+      fprintf('Generating EEG derivative dataset')
+    elseif isequal(cfg.datatype, 'beh_info')
+      fprintf('Generating behavioural preprocessed derivative')
     else
       ft_error('cannot determine the type of the data, please specify cfg.datatype');
     end
@@ -2338,11 +2342,11 @@ switch typ
     dir = 'dwi';
   case {'phasediff' 'phase1' 'phase2' 'magnitude1' 'magnitude2' 'magnitude' 'fieldmap' 'epi'}
     dir = 'fmap';
-  case {'events' 'stim' 'physio' 'emg' 'exg' 'eyetracker' 'motion' 'audio' 'video'} % these could also all be stored in 'func' or one of the other directories with brain data
+  case {'events' 'stim' 'physio' 'emg' 'exg' 'eyetracker' 'motion' 'audio' 'video' 'beh_info'} % these could also all be stored in 'func' or one of the other directories with brain data
     dir = 'beh';
   case {'meg'} % this could also include 'events' or other non-brain data
     dir = 'meg';
-  case {'eeg'} % this could also include 'events' or other non-brain data
+  case {'eeg' 'eeg_deriv'} % this could also include 'events' or other non-brain data
     dir = 'eeg';
   case {'ieeg'} % this could also include 'events' or other non-brain data
     dir = 'ieeg';
