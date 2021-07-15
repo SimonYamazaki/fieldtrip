@@ -944,9 +944,9 @@ switch typ
     elseif isequal(cfg.datatype, 'events')
       need_events_tsv = true;
     elseif isequal(cfg.datatype, 'eeg_deriv') 
-      fprintf('Generating EEG derivative dataset')
+      fprintf('Working with EEG derivative dataset \n')
     elseif isequal(cfg.datatype, 'beh_info')
-      fprintf('Generating behavioural preprocessed derivative')
+      fprintf('Working with preprocessed behavioural derivative data \n')
     else
       ft_error('cannot determine the type of the data, please specify cfg.datatype');
     end
@@ -968,7 +968,7 @@ switch typ
     
     if ~isempty(cfg.dataset)
       if cfg.non_raw_data
-          fprintf('Working with sourcedata')
+          fprintf('Working with sourcedata \n')
       else
           hdr = ft_read_header(cfg.headerfile, headeropt{:});
           if strcmp(cfg.method, 'convert')
@@ -1384,7 +1384,7 @@ if need_channels_tsv
     keep(i) = ischar(channels_tsv.name{i});
   end
   channels_tsv = channels_tsv(keep,:);
-  
+
   % do a sanity check on the number of channels for the electrophysiology data types
   if need_meg_json
     type_json = meg_json;
@@ -1875,7 +1875,8 @@ for i=1:numel(modality)
     end
     
     if isfile(filename)
-      existing = ft_read_tsv(filename);
+      %existing = ft_read_tsv(filename);
+       existing = readtable(filename,'FileType','text');
     else
       existing = [];
     end
@@ -1987,7 +1988,7 @@ if ~isempty(cfg.bidsroot)
     % write [] as 'n/a'
     % write nan as 'n/a'
     % write boolean as 'True' or 'False'
-    this.(fn{i}) = output_compatible(cfg.scans.(fn{i}));
+    this.(fn{i}) = (cfg.scans.(fn{i}));
   end
   
   if isfile(filename)
