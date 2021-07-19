@@ -1896,8 +1896,12 @@ for i=1:numel(modality)
           existing      = output_compatible(existing);
           
           if strcmp(modality{i}, 'events')
+             %merge only rows that are different from existing
+            modality_tsv = modality_tsv(~ismember(existing.sample,modality_tsv.sample),:);
+            
             % merge complete rows
             modality_tsv = merge_table(modality_tsv, existing);
+            
           else
             % use the channel name as the unique key
             modality_tsv = merge_table(modality_tsv, existing, 'name');
@@ -2222,21 +2226,23 @@ else
   end
   
   fn = fieldnames(event);
-  additional_measures = {};
-  for ii = 1:length(fn)-5
-    col = {event.(fn{ii+5})};
-    if all(cellfun(@isnumeric, col))
-    %    this can be an array of strings or values
-        additional_measures{end+1} = cell2mat(col);
-    else
-        additional_measures{end+1} = col;
-    end
+  if length(fn)>5
+      additional_measures = {};
+      for ii = 1:length(fn)-5
+        col = {event.(fn{ii+5})};
+        if all(cellfun(@isnumeric, col))
+        %    this can be an array of strings or values
+            additional_measures{end+1} = cell2mat(col);
+        else
+            additional_measures{end+1} = col;
+        end
+      end
   end
-
+  
   if exist('sample', 'var')
     tab = table(onset, duration, sample, type, value);
     for ii = 1:length(fn)-5
-        tab = [tab, table(additional_measures{ii}', 'VariableNames', {fn{ii+5}})];
+        tab = [tab, table( additional_measures{ii}', 'VariableNames',  fn(ii+5) )]; %{fn{ii+5}}
     end
     
   else
