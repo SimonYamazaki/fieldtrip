@@ -968,7 +968,7 @@ switch typ
     
     if ~isempty(cfg.dataset)
       if cfg.non_raw_data
-          fprintf('Working with sourcedata \n')
+          fprintf('Working with non-raw \n')
       else
           hdr = ft_read_header(cfg.headerfile, headeropt{:});
           if strcmp(cfg.method, 'convert')
