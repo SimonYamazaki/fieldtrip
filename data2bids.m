@@ -2003,8 +2003,12 @@ if ~isempty(cfg.bidsroot)
     scans_tsv = this;
   end
   
-  % write the updated file back to disk
-  ft_write_tsv(filename, scans_tsv);
+  if cfg.include_scans == false
+    fprintf('Not generating a scans.tsv file')
+  else
+      % write the updated file back to disk
+      ft_write_tsv(filename, scans_tsv);
+  end 
   
 end % if bidsroot
 
