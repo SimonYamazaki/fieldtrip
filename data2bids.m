@@ -1587,10 +1587,8 @@ if need_events_tsv
   elseif isstruct(cfg.events) && ~isempty(cfg.events) && numel(fieldnames(cfg.events))>0
     % it is the output from FT_READ_EVENT
     if exist('hdr', 'var')
-      disp('WAS HERE 1')
       events_tsv = event2table(hdr, cfg.events);
     else
-      disp('WAS HERE 2')
       events_tsv = event2table([], cfg.events);
     end
   elseif isnumeric(cfg.events) && ~isempty(cfg.events)
@@ -1608,15 +1606,12 @@ if need_events_tsv
   elseif exist('trigger', 'var')
     % convert the triggers from FT_READ_EVENT into a table
     if exist('hdr', 'var')
-      disp('WAS HERE 3')
       events_tsv = event2table(hdr, trigger);
     else
-      disp('WAS HERE 4')
       events_tsv = event2table([], trigger);
     end
   elseif ~isempty(cfg.presentationfile)
     % read the presentation file and convert into a table
-    disp('WAS HERE 5')
     events_tsv = event2table([], ft_read_event(cfg.presentationfile));
   else
     ft_warning('no events were specified');
@@ -2230,11 +2225,12 @@ else
   end
   
   fn = fieldnames(event);
+  
   if length(fn)>5
       additional_measures = {};
       for ii = 1:length(fn)-5
         col = {event.(fn{ii+5})};
-        if all(cellfun(@isnumeric, col))
+        if all(cellfun(@isnumeric, col)) && all(cellfun(@(x) ~isempty(x), col))
         %    this can be an array of strings or values
             additional_measures{end+1} = cell2mat(col);
         else
@@ -2246,6 +2242,8 @@ else
   if exist('sample', 'var')
     tab = table(onset, duration, sample, type, value);
     for ii = 1:length(fn)-5
+        size(table( additional_measures{ii}', 'VariableNames',  fn(ii+5) ))
+        additional_measures{ii}
         tab = [tab, table( additional_measures{ii}', 'VariableNames',  fn(ii+5) )]; %{fn{ii+5}}
     end
     
