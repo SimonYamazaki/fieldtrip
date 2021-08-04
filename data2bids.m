@@ -2242,8 +2242,6 @@ else
   if exist('sample', 'var')
     tab = table(onset, duration, sample, type, value);
     for ii = 1:length(fn)-5
-        size(table( additional_measures{ii}', 'VariableNames',  fn(ii+5) ))
-        additional_measures{ii}
         tab = [tab, table( additional_measures{ii}', 'VariableNames',  fn(ii+5) )]; %{fn{ii+5}}
     end
     
