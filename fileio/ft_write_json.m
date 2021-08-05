@@ -37,8 +37,8 @@ ft_hastoolbox('jsonlab', 1);
 % write nan as 'n/a'
 % write boolean as True/False
 str = savejson('', json, 'NaN', '"n/a"', 'ParseLogical', true);
-fid = fopen_or_error(filename, 'w');
-fwrite(fid, str);
+fid = fopen_or_error(filename, 'w','n','UTF-8');
+fwrite(fid, str,'char');
 fclose(fid);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

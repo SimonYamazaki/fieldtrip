@@ -37,7 +37,7 @@ for i=1:numel(fn)
   % write boolean as 'True' or 'False'
   tsv.(fn{i}) = output_compatible(tsv.(fn{i}));
 end
-writetable(tsv, filename, 'Delimiter', 'tab', 'FileType', 'text');
+writetable(tsv, filename, 'Delimiter', 'tab', 'FileType', 'text','Encoding','UTF-8');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SUBFUNCTION this is shared with DATA2BIDS

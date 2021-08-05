@@ -310,7 +310,7 @@ cfg.coordsystem   = ft_getopt(cfg, 'coordsystem');
 cfg.dataset_description                     = ft_getopt(cfg, 'dataset_description'                       );
 cfg.dataset_description.writesidecar        = ft_getopt(cfg.dataset_description, 'writesidecar', 'yes'   );
 cfg.dataset_description.Name                = ft_getopt(cfg.dataset_description, 'Name'                  ); % REQUIRED. Name of the dataset.
-cfg.dataset_description.BIDSVersion         = ft_getopt(cfg.dataset_description, 'BIDSVersion', 1.2      ); % REQUIRED. The version of the BIDS standard that was used.
+cfg.dataset_description.BIDSVersion         = ft_getopt(cfg.dataset_description, 'BIDSVersion',1.6       ); % REQUIRED. The version of the BIDS standard that was used.
 cfg.dataset_description.DatasetType         = ft_getopt(cfg.dataset_description, 'DatasetType', 'raw'    ); % RECOMMENDED. The interpretaton of the dataset. MUST be one of "raw" or "derivative". For backwards compatibility, the default value is "raw".
 cfg.dataset_description.License             = ft_getopt(cfg.dataset_description, 'License'               ); % RECOMMENDED. What license is this dataset distributed under? The use of license name abbreviations is suggested for specifying a license. A list of common licenses with suggested abbreviations can be found in Appendix II.
 cfg.dataset_description.Authors             = ft_getopt(cfg.dataset_description, 'Authors'               ); % OPTIONAL. List of individuals who contributed to the creation/curation of the dataset.
@@ -1385,6 +1385,9 @@ if need_channels_tsv
   end
   channels_tsv = channels_tsv(keep,:);
 
+  channels_tsv.type = upper(channels_tsv.type);
+  
+  
   % do a sanity check on the number of channels for the electrophysiology data types
   if need_meg_json
     type_json = meg_json;
@@ -1631,7 +1634,7 @@ if need_events_tsv
     
   else
     % ensure that column names are in lower case
-    events_tsv.Properties.VariableNames = lower(events_tsv.Properties.VariableNames);
+    %events_tsv.Properties.VariableNames = lower(events_tsv.Properties.VariableNames);
     
     % ensure that the onset and duration appear as the first two columns
     order = nan(1, size(events_tsv,2));
@@ -1999,7 +2002,7 @@ if ~isempty(cfg.bidsroot)
   end
   
   if cfg.include_scans == false
-    fprintf('Not generating a scans.tsv file')
+    fprintf('Not wrinting a scans.tsv file\n')
   else
       % write the updated file back to disk
       ft_write_tsv(filename, scans_tsv);
