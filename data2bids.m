@@ -310,7 +310,7 @@ cfg.coordsystem   = ft_getopt(cfg, 'coordsystem');
 cfg.dataset_description                     = ft_getopt(cfg, 'dataset_description'                       );
 cfg.dataset_description.writesidecar        = ft_getopt(cfg.dataset_description, 'writesidecar', 'yes'   );
 cfg.dataset_description.Name                = ft_getopt(cfg.dataset_description, 'Name'                  ); % REQUIRED. Name of the dataset.
-cfg.dataset_description.BIDSVersion         = ft_getopt(cfg.dataset_description, 'BIDSVersion', 1.6      ); % REQUIRED. The version of the BIDS standard that was used.
+cfg.dataset_description.BIDSVersion         = ft_getopt(cfg.dataset_description, 'BIDSVersion', '1.6'    ); % REQUIRED. The version of the BIDS standard that was used.
 cfg.dataset_description.DatasetType         = ft_getopt(cfg.dataset_description, 'DatasetType', 'raw'    ); % RECOMMENDED. The interpretaton of the dataset. MUST be one of "raw" or "derivative". For backwards compatibility, the default value is "raw".
 cfg.dataset_description.License             = ft_getopt(cfg.dataset_description, 'License'               ); % RECOMMENDED. What license is this dataset distributed under? The use of license name abbreviations is suggested for specifying a license. A list of common licenses with suggested abbreviations can be found in Appendix II.
 cfg.dataset_description.Authors             = ft_getopt(cfg.dataset_description, 'Authors'               ); % OPTIONAL. List of individuals who contributed to the creation/curation of the dataset.
@@ -820,7 +820,13 @@ switch typ
     
   case {'brainvision_vhdr', 'edf', 'eeglab_set', 'biosemi_bdf'}
     % the file on disk contains ExG data in a BIDS compiant format
-    hdr = ft_read_header(cfg.headerfile, 'checkmaxfilter', false, 'readbids', false);
+    
+    if isfield(cfg,'hdr')
+        hdr = cfg.hdr;
+    else
+        hdr = ft_read_header(cfg.headerfile, 'checkmaxfilter', false, 'readbids', false);
+    end
+    
     if strcmp(cfg.method, 'convert')
       % the data should be converted and written to disk
       dat = ft_read_data(cfg.datafile, 'header', hdr, 'checkboundary', false, 'begsample', 1, 'endsample', hdr.nSamples*hdr.nTrials);
@@ -970,7 +976,12 @@ switch typ
       if cfg.non_raw_data
           fprintf('Working with non-raw \n')
       else
-          hdr = ft_read_header(cfg.headerfile, headeropt{:});
+          if isfield(cfg,'hdr')
+            hdr = cfg.hdr;
+          else
+            hdr = ft_read_header(cfg.headerfile, headeropt{:});
+          end
+          
           if strcmp(cfg.method, 'convert')
             % the data should be converted and written to disk
             dat = ft_read_data(cfg.datafile, 'header', hdr, 'begsample', 1, 'endsample', hdr.nSamples*hdr.nTrials, dataopt{:});
@@ -1384,9 +1395,6 @@ if need_channels_tsv
     keep(i) = ischar(channels_tsv.name{i});
   end
   channels_tsv = channels_tsv(keep,:);
-
-  channels_tsv.type = upper(channels_tsv.type);
-  
   
   % do a sanity check on the number of channels for the electrophysiology data types
   if need_meg_json
@@ -1870,6 +1878,17 @@ for i=1:numel(modality)
       [p, f] = fileparts(cfg.outputfile);
       f = remove_datatype(f); % remove _bold, _meg, etc.
       filename = fullfile(p, sprintf('%s_%s.tsv', f, modality{i}));
+      
+      if strcmp(modality{i},'channels')
+          cols = modality_tsv.Properties.VariableNames;
+          for c = 1:length(cols)
+            if any(strcmp(modality_tsv.(cols{c}),'unknown'))
+                fprintf('Unknown channel %s found in %s\n',cols{c},filename)
+            end
+          end
+          modality_tsv.type = upper(modality_tsv.type);
+      end
+      
     end
     
     if isfile(filename)
