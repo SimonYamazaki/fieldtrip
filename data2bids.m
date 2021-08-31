@@ -1420,9 +1420,9 @@ if need_channels_tsv
       jsoncount = jsoncount + type_json.(fn{i});
     end
   end
-  if size(channels_tsv,1)~=jsoncount
-    ft_warning('incorrect specification of the channel count: %d in the json, %d in the tsv', jsoncount, size(channels_tsv,1));
-  end
+%   if size(channels_tsv,1)~=jsoncount
+%     ft_warning('incorrect specification of the channel count: %d in the json, %d in the tsv', jsoncount, size(channels_tsv,1));
+%   end
 end % if need_channels_tsv
 
 %% need_electrodes_tsv
@@ -1652,7 +1652,9 @@ if need_events_tsv
     events_tsv = events_tsv(:,order);
     
     % sort the events ascending on the onset
-    events_tsv = sortrows(events_tsv, 'onset');
+    if cfg.keep_events_order
+        events_tsv = sortrows(events_tsv, 'onset');
+    end
   end
   
   if ~isempty(cfg.presentationfile) && need_mri_json
@@ -1665,7 +1667,6 @@ end % if need_events_tsv
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% write or copy the data to the output file
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 [p, f, x] = fileparts(cfg.outputfile);
 isdir_or_mkdir(p);
 
