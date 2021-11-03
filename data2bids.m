@@ -1530,7 +1530,7 @@ if need_coordsystem_json
 end % if need_coordsystem_json
 
 %% need_events_tsv
-if need_events_tsv
+if need_events_tsv && cfg.write_events_tsv
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %% align the presentation events with BOLD volumes or MEG/EEG triggers
@@ -1580,7 +1580,7 @@ if need_events_tsv
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   %% convert the events into a table
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
+      
   if istable(cfg.events) && all(ismember({'onset', 'duration'}, fieldnames(cfg.events)))
     % use the events table as it is
     events_tsv = cfg.events;
