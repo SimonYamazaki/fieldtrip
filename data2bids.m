@@ -1899,6 +1899,15 @@ for i=1:numel(modality)
       existing = [];
     end
     
+    if not(cfg.channels_in_sub_dir) && strcmp(modality{i}, {'channels'})
+        filename_split = strsplit(filename,'_');
+        if cfg.include_task_name
+            filename = fullfile(cfg.bidsroot,strcat(filename_split{end-1},'_',filename_split{end}));
+        else
+            filename = fullfile(cfg.bidsroot,filename_split{end});
+        end
+    end
+    
     switch cfg.writetsv
       case 'yes'
         if ~isempty(existing)
