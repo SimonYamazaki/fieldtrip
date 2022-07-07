@@ -1857,6 +1857,11 @@ end % for each modality
 
 % each of these has a corresponding tsv file
 modality = {'channels', 'electrodes', 'optodes', 'events'};
+
+if not(cfg.write_events_tsv)
+    modality = {'channels', 'electrodes', 'optodes'};
+end
+
 for i=1:numel(modality)
   if eval(sprintf('need_%s_tsv', modality{i}))
     modality_tsv = eval(sprintf('%s_tsv', modality{i}));
@@ -1998,8 +2003,9 @@ if ~isempty(cfg.bidsroot)
   end
   
   % write the updated file back to disk
-  ft_write_tsv(filename, participants);
-  
+  if cfg.write_participants_tsv
+    ft_write_tsv(filename, participants);
+  end
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % update the scans.tsv
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
